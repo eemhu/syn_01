@@ -4,16 +4,24 @@ import com.teragrep.syn_01.claims.Claim;
 import com.teragrep.syn_01.claims.results.ClaimResult;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public final class KeyValuePairClaim implements Claim {
 
     public KeyValuePairClaim() {}
 
     @Override
-    public ClaimResult claim(final ClaimResult previous, final ByteBuffer input) {
+    public Claim claim(final Claim previous, final ByteBuffer input) {
+        throw new UnsupportedOperationException();
+    }
 
-        KeyClaim keyClaim = new KeyClaim();
+    @Override
+    public Status status() {
+        throw new UnsupportedOperationException();
+    }
 
-        throw new RuntimeException();
+    @Override
+    public List<ByteBuffer> buffers() {
+        throw new UnsupportedOperationException();
     }
 }

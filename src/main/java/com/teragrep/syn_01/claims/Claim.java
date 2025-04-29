@@ -1,9 +1,16 @@
 package com.teragrep.syn_01.claims;
 
-import com.teragrep.syn_01.claims.results.ClaimResult;
-
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public interface Claim {
-    ClaimResult claim(ClaimResult previous, ByteBuffer input);
+    enum Status {
+        INITIAL,
+        IN_PROGRESS,
+        SUCCESSFUL,
+        FAILED
+    }
+    Claim claim(Claim previous, ByteBuffer input);
+    Status status();
+    List<ByteBuffer> buffers();
 }

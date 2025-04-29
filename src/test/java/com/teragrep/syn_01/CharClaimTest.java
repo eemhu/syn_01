@@ -1,7 +1,7 @@
 package com.teragrep.syn_01;
 
-import com.teragrep.syn_01.claims.results.ClaimResult;
-import com.teragrep.syn_01.claims.results.EmptyClaimResult;
+import com.teragrep.syn_01.claims.Claim;
+import com.teragrep.syn_01.claims.EmptyClaim;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -12,14 +12,14 @@ public final class CharClaimTest {
     @Test
     void testCharClaim() {
         CharClaim charClaim = new CharClaim('a');
-        ClaimResult cr = charClaim.claim(new EmptyClaimResult(), ByteBuffer.wrap("a".getBytes(StandardCharsets.UTF_8)));
-        Assertions.assertEquals(ClaimResult.Status.SUCCESS, cr.status());
+        Claim cr = charClaim.claim(new EmptyClaim(), ByteBuffer.wrap("a".getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertEquals(Claim.Status.SUCCESSFUL, cr.status());
     }
 
     @Test
     void testCharClaimFailed() {
         CharClaim charClaim = new CharClaim('a');
-        ClaimResult cr = charClaim.claim(new EmptyClaimResult(), ByteBuffer.wrap("b".getBytes(StandardCharsets.UTF_8)));
-        Assertions.assertEquals(ClaimResult.Status.FAILED, cr.status());
+        Claim cr = charClaim.claim(new EmptyClaim(), ByteBuffer.wrap("b".getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertEquals(Claim.Status.FAILED, cr.status());
     }
 }

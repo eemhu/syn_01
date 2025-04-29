@@ -6,6 +6,7 @@ import com.teragrep.syn_01.claims.results.ClaimResult;
 import com.teragrep.syn_01.claims.results.ClaimResultImpl;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public class OrClaim implements Claim {
     private final Claim first;
@@ -17,21 +18,21 @@ public class OrClaim implements Claim {
     }
 
     @Override
-    public ClaimResult claim(final ClaimResult previous, final ByteBuffer input) {
+    public Claim claim(final Claim previous, final ByteBuffer input) {
         // OR uses same input for both
-        final ClaimResult firstResult = first.claim(previous, input);
-        final ClaimResult secondResult = second.claim(previous, input);
+        final Claim firstResult = first.claim(previous, input);
+        final Claim secondResult = second.claim(previous, input);
 
-        if (firstResult.status().equals(ClaimResult.Status.IN_PROGRESS)) {
-            return new ClaimResultImpl(
-                    firstResult.remainingBuffers(),
+        if (firstResult.status().equals(Claim.Status.IN_PROGRESS)) {
+          /*  return new ClaimImpl(
+                    firstResult.buffers(),
                     String.class,
                     firstResult.status(),
                     "OR",
                     new ContinuationPointImpl(this)
-            );
+            ); */
         }
-        else if (firstResult.status().equals(ClaimResult.Status.SUCCESS)) {
+        else if (firstResult.status().equals(Status.SUCCESSFUL)) {
             
         }
         else {
@@ -39,5 +40,15 @@ public class OrClaim implements Claim {
         }
 
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public Status status() {
+        return null;
+    }
+
+    @Override
+    public List<ByteBuffer> buffers() {
+        return List.of();
     }
 }

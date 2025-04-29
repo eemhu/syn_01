@@ -1,37 +1,60 @@
 package com.teragrep.syn_01.claims.bools;
 
-import com.teragrep.syn_01.ContinuationPointImpl;
 import com.teragrep.syn_01.claims.Claim;
-import com.teragrep.syn_01.claims.results.ClaimResult;
-import com.teragrep.syn_01.claims.results.ClaimResultImpl;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public final class AndClaim implements Claim {
     private final Claim first;
     private final Claim second;
+    private final Claim.Status status;
+    private final List<ByteBuffer> buffers;
+
 
     public AndClaim(final Claim first, final Claim second) {
+        this(first, second, Status.INITIAL, List.of());
+    }
+
+    public AndClaim(final Claim first, final Claim second, final Status status, final List<ByteBuffer> buffers) {
         this.first = first;
         this.second = second;
+        this.status = status;
+        this.buffers = buffers;
     }
 
     @Override
-    public ClaimResult claim(final ClaimResult previous, final ByteBuffer input) {
+    public Claim claim(final Claim previous, final ByteBuffer input) {
+        Claim firstClaim = first;
+        Claim secondClaim = second;
 
-        final ClaimResult firstResult = first.claim(previous, input);
-        if (!firstResult.status().equals(ClaimResult.Status.SUCCESS)) {
-            return new ClaimResultImpl(
-                    firstResult.remainingBuffers(),
-                    String.class,
-                    firstResult.status(),
-                    "AND",
-                    new ContinuationPointImpl(this)
-            );
+
+        if (firstClaim.status().equals(Status.IN_PROGRESS) || firstClaim.status().equals(Status.INITIAL)) {
+            // continue from first
+            firstClaim = firstClaim.claim(previous, input);
+            return new AndClaim(firstClaim, secondClaim, Status.IN_PROGRESS, firstClaim.buffers());
         }
-        else {
-            final ClaimResult secondResult = second.claim(firstResult, ByteBuffer.wrap(new byte[0]));
-            return secondResult;
+        else if (firstClaim.status().equals(Status.SUCCESSFUL)) {
+            // first success, go to second
+            if (secondClaim.status().equals(Status.IN_PROGRESS) || secondClaim.status().equals(Status.INITIAL)) {
+                secondClaim = secondClaim.claim(previous, input);
+                return new AndClaim(firstClaim, secondClaim, secondClaim.status(), secondClaim.buffers());
+            }
+            else if (secondClaim.status().equals(Status.SUCCESSFUL)) {
+                return new AndClaim(firstClaim, secondClaim, Status.SUCCESSFUL, secondClaim.buffers());
+            }
         }
+
+        return new AndClaim(firstClaim, secondClaim, Status.FAILED, buffers);
+    }
+
+    @Override
+    public Status status() {
+        return status;
+    }
+
+    @Override
+    public List<ByteBuffer> buffers() {
+        return buffers;
     }
 }

@@ -9,16 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ValueClaim implements Claim {
+    private final Status status;
+    private final List<ByteBuffer> buffers;
 
-    public ValueClaim() {}
+    public ValueClaim() {
+        this(Status.INITIAL, List.of());
+    }
+
+    public ValueClaim(final Status status, final List<ByteBuffer> buffers) {
+        this.status = status;
+        this.buffers = buffers;
+    }
 
     @Override
-    public ClaimResult claim(final ClaimResult previous, final ByteBuffer input) {
+    public Claim claim(final Claim previous, final ByteBuffer input) {
         final List<ByteBuffer> buffers = new ArrayList<>();
 
-        if (previous.status().equals(ClaimResult.Status.IN_PROGRESS)) {
+        if (previous.status().equals(Status.IN_PROGRESS)) {
             System.out.println("Previous attempt in progress, add buffers");
-            buffers.addAll(previous.remainingBuffers());
+            buffers.addAll(previous.buffers());
         }
         buffers.add(input);
 
@@ -54,22 +63,24 @@ public final class ValueClaim implements Claim {
 
         // OK key
         if (complete) {
-            return new ClaimResultImpl(
-                    rv,
-                    String.class,
-                    ClaimResult.Status.SUCCESS,
-                    this.getClass().getSimpleName(),
-                    new ContinuationPointImpl(this)
+            return new ValueClaim(
+                    Status.SUCCESSFUL, rv
             );
         } else {
             // ran out of buffer, need to try again?
-            return new ClaimResultImpl(
-                    buffers,
-                    String.class,
-                    ClaimResult.Status.IN_PROGRESS,
-                    this.getClass().getSimpleName(),
-                    new ContinuationPointImpl(this)
+            return new ValueClaim(
+                    Status.IN_PROGRESS, buffers
             );
         }
+    }
+
+    @Override
+    public Status status() {
+        return status;
+    }
+
+    @Override
+    public List<ByteBuffer> buffers() {
+        return buffers;
     }
 }

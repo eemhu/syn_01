@@ -10,17 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class KeyClaim implements Claim {
+    private final Claim.Status status;
+    private final List<ByteBuffer> buffers;
 
-    public KeyClaim() {}
+    public KeyClaim() {
+        this(Status.INITIAL, List.of());
+    }
+
+    public KeyClaim(final Status status, final List<ByteBuffer> buffers) {
+        this.status = status;
+        this.buffers = buffers;
+    }
 
     @Override
-    public ClaimResult claim(final ClaimResult previous, final ByteBuffer input) {
-        final List<ByteBuffer> buffers = new ArrayList<>();
-
-       // if (previous.status().equals(ClaimResult.Status.IN_PROGRESS)) {
-         //   System.out.println("Previous attempt in progress, add buffers");
-            buffers.addAll(previous.remainingBuffers());
-        //}
+    public Claim claim(final Claim previous, final ByteBuffer input) {
+        final List<ByteBuffer> buffers = new ArrayList<>(previous.buffers());
         buffers.add(input);
 
         boolean complete = false;
@@ -28,7 +32,6 @@ public final class KeyClaim implements Claim {
         List<ByteBuffer> rv = new ArrayList<>();
 
         for (final ByteBuffer buffer : buffers) {
-            System.out.println("New buffer: " + buffer);
             ByteBuffer slice = buffer.slice();
             int read = 0;
 
@@ -43,7 +46,10 @@ public final class KeyClaim implements Claim {
                 } else if (b == '"') {
                     open = true;
                 } else if (!open) {
-                    return new FailedClaimResult();
+                    return new KeyClaim(
+                            Status.FAILED,
+                            List.of()
+                    );
                 }
                 //TODO: Check for non-allowed characters also
                 //  and fail the parsing if exists
@@ -58,22 +64,20 @@ public final class KeyClaim implements Claim {
 
         // OK key
         if (complete) {
-            return new ClaimResultImpl(
-                    rv,
-                    String.class,
-                    ClaimResult.Status.SUCCESS,
-                    this.getClass().getSimpleName(),
-                    new ContinuationPointImpl(this)
-            );
+            return new KeyClaim(Status.SUCCESSFUL, rv);
         } else {
             // ran out of buffer, need to try again?
-            return new ClaimResultImpl(
-                    buffers,
-                    String.class,
-                    ClaimResult.Status.IN_PROGRESS,
-                    this.getClass().getSimpleName(),
-                    new ContinuationPointImpl(this)
-            );
+            return new KeyClaim(Status.IN_PROGRESS, buffers);
         }
+    }
+
+    @Override
+    public Status status() {
+        return status;
+    }
+
+    @Override
+    public List<ByteBuffer> buffers() {
+        return buffers;
     }
 }

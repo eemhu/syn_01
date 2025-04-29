@@ -6,27 +6,22 @@ import com.teragrep.syn_01.claims.results.ClaimResultImpl;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.List;
 
 public final class JsonObjectClaim implements Claim {
 
+    @Override
+    public Claim claim(final Claim previous, final ByteBuffer input) {
+        return null;
+    }
 
     @Override
-    public ClaimResult claim(final ClaimResult previous, final ByteBuffer input) {
-        // { KeyValuePair(s) }
-
-        byte b = input.get();
-        if (b != '{') {
-            return new ClaimResultImpl(
-                    Collections.emptyList(),
-                    null,
-                    ClaimResult.Status.FAILED,
-                    "LBRACE",
-                    new ContinuationPointImpl(this)
-            );
-        }
-
-
-
+    public Status status() {
         return null;
+    }
+
+    @Override
+    public List<ByteBuffer> buffers() {
+        return List.of();
     }
 }
