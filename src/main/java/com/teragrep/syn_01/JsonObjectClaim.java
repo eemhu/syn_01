@@ -24,4 +24,9 @@ public final class JsonObjectClaim implements Claim {
     public List<ByteBuffer> buffers() {
         return List.of();
     }
+
+    @Override
+    public int length() {
+        return 0;
+    }
 }

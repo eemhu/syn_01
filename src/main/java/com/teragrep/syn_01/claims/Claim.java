@@ -13,4 +13,5 @@ public interface Claim {
     Claim claim(Claim previous, ByteBuffer input);
     Status status();
     List<ByteBuffer> buffers();
+    int length();
 }

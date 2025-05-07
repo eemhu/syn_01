@@ -24,4 +24,9 @@ public final class KeyValuePairClaim implements Claim {
     public List<ByteBuffer> buffers() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public int length() {
+        throw new UnsupportedOperationException();
+    }
 }

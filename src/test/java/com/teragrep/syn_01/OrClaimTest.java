@@ -51,4 +51,16 @@ public final class OrClaimTest {
         result = result.claim(result, ByteBuffer.wrap("a".getBytes(StandardCharsets.UTF_8)));
         Assertions.assertEquals(Claim.Status.SUCCESSFUL, result.status());
     }
+
+    @Test
+    void testBothFailure() {
+        Claim c1 = new CharClaim('a');
+        Claim c2 = new CharClaim('b');
+        ByteBuffer b0 = ByteBuffer.wrap("c".getBytes(StandardCharsets.UTF_8));
+        Claim orClaim = new OrClaim(c1, c2);
+        Claim result = orClaim.claim(new EmptyClaim(), b0);
+        result = result.claim(result, ByteBuffer.wrap("a".getBytes(StandardCharsets.UTF_8)));
+        result = result.claim(result, ByteBuffer.wrap("b".getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertEquals(Claim.Status.FAILED, result.status());
+    }
 }

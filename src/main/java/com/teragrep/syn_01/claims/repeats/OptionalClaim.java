@@ -27,4 +27,9 @@ public final class OptionalClaim implements Claim {
     public List<ByteBuffer> buffers() {
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+    @Override
+    public int length() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 }

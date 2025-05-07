@@ -12,14 +12,16 @@ import java.util.List;
 public final class KeyClaim implements Claim {
     private final Claim.Status status;
     private final List<ByteBuffer> buffers;
+    private final int length;
 
     public KeyClaim() {
-        this(Status.INITIAL, List.of());
+        this(Status.INITIAL, List.of(), 0);
     }
 
-    public KeyClaim(final Status status, final List<ByteBuffer> buffers) {
+    public KeyClaim(final Status status, final List<ByteBuffer> buffers, final int length) {
         this.status = status;
         this.buffers = buffers;
+        this.length = length;
     }
 
     @Override
@@ -48,7 +50,8 @@ public final class KeyClaim implements Claim {
                 } else if (!open) {
                     return new KeyClaim(
                             Status.FAILED,
-                            List.of()
+                            List.of(),
+                            -1
                     );
                 }
                 //TODO: Check for non-allowed characters also
@@ -64,10 +67,10 @@ public final class KeyClaim implements Claim {
 
         // OK key
         if (complete) {
-            return new KeyClaim(Status.SUCCESSFUL, rv);
+            return new KeyClaim(Status.SUCCESSFUL, rv, -1);
         } else {
             // ran out of buffer, need to try again?
-            return new KeyClaim(Status.IN_PROGRESS, buffers);
+            return new KeyClaim(Status.IN_PROGRESS, buffers, -1);
         }
     }
 
@@ -79,5 +82,10 @@ public final class KeyClaim implements Claim {
     @Override
     public List<ByteBuffer> buffers() {
         return buffers;
+    }
+
+    @Override
+    public int length() {
+        return length;
     }
 }

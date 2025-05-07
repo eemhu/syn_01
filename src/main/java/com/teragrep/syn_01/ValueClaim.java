@@ -11,14 +11,16 @@ import java.util.List;
 public final class ValueClaim implements Claim {
     private final Status status;
     private final List<ByteBuffer> buffers;
+    private final int length;
 
     public ValueClaim() {
-        this(Status.INITIAL, List.of());
+        this(Status.INITIAL, List.of(), 0);
     }
 
-    public ValueClaim(final Status status, final List<ByteBuffer> buffers) {
+    public ValueClaim(final Status status, final List<ByteBuffer> buffers, final int length) {
         this.status = status;
         this.buffers = buffers;
+        this.length = length;
     }
 
     @Override
@@ -64,12 +66,12 @@ public final class ValueClaim implements Claim {
         // OK key
         if (complete) {
             return new ValueClaim(
-                    Status.SUCCESSFUL, rv
+                    Status.SUCCESSFUL, rv, -1
             );
         } else {
             // ran out of buffer, need to try again?
             return new ValueClaim(
-                    Status.IN_PROGRESS, buffers
+                    Status.IN_PROGRESS, buffers, -1
             );
         }
     }
@@ -82,5 +84,10 @@ public final class ValueClaim implements Claim {
     @Override
     public List<ByteBuffer> buffers() {
         return buffers;
+    }
+
+    @Override
+    public int length() {
+        return length;
     }
 }
