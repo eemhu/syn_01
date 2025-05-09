@@ -1,7 +1,6 @@
 package com.teragrep.syn_01.claims.repeats;
 
 import com.teragrep.syn_01.claims.Claim;
-import com.teragrep.syn_01.claims.results.ClaimResult;
 
 import java.nio.ByteBuffer;
 import java.util.List;

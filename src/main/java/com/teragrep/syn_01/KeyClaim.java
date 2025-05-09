@@ -1,9 +1,6 @@
 package com.teragrep.syn_01;
 
 import com.teragrep.syn_01.claims.Claim;
-import com.teragrep.syn_01.claims.results.ClaimResult;
-import com.teragrep.syn_01.claims.results.ClaimResultImpl;
-import com.teragrep.syn_01.claims.results.FailedClaimResult;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
