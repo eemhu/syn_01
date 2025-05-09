@@ -28,7 +28,7 @@ public final class ValueClaim implements Claim {
         final List<ByteBuffer> buffers = new ArrayList<>();
 
         if (previous.status().equals(Status.IN_PROGRESS)) {
-            System.out.println("Previous attempt in progress, add buffers");
+
             buffers.addAll(previous.buffers());
         }
         buffers.add(input);

@@ -26,7 +26,10 @@ public final class KeyClaim implements Claim {
 
     @Override
     public Claim claim(final Claim previous, final ByteBuffer input) {
-        final List<ByteBuffer> buffers = new ArrayList<>(previous.buffers());
+        final List<ByteBuffer> buffers = new ArrayList<>(this.buffers);
+        if (buffers.isEmpty()) {
+            buffers.addAll(previous.buffers());
+        }
         buffers.add(input);
 
         boolean complete = false;
@@ -35,14 +38,11 @@ public final class KeyClaim implements Claim {
 
         for (final ByteBuffer buffer : buffers) {
             ByteBuffer slice = buffer.slice();
-            int read = 0;
 
             while (slice.hasRemaining()) {
                 final byte b = slice.get();
-                read++;
 
                 if (open && b == '"') {
-                    slice = slice.limit(read);
                     complete = true;
                     break;
                 } else if (b == '"') {
@@ -51,7 +51,7 @@ public final class KeyClaim implements Claim {
                     return new KeyClaim(
                             Status.FAILED,
                             List.of(),
-                            -1
+                            0
                     );
                 }
                 //TODO: Check for non-allowed characters also

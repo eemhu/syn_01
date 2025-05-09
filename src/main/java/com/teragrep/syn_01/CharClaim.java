@@ -4,6 +4,7 @@ import com.teragrep.syn_01.claims.Claim;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class CharClaim implements Claim {
@@ -26,36 +27,46 @@ public final class CharClaim implements Claim {
 
     @Override
     public Claim claim(final Claim previous, final ByteBuffer input) {
-        final List<ByteBuffer> buffers = new ArrayList<>();
 
-        if (previous.status().equals(Claim.Status.IN_PROGRESS)) {
+      /*  if (previous.status().equals(Claim.Status.IN_PROGRESS)) {
             System.out.println("Previous attempt in progress, add buffers");
+
+        }*/
+        final List<ByteBuffer> buffers = new ArrayList<>(this.buffers);
+        if (buffers.isEmpty()) {
             buffers.addAll(previous.buffers());
         }
         buffers.add(input);
 
+
+
         boolean complete = false;
         List<ByteBuffer> rv = new ArrayList<>();
 
+        System.out.println("CharClaim for char " + c);
+        System.out.println(buffers);
+
         for (final ByteBuffer buffer : buffers) {
+            System.out.println("Looping:"+buffer);
             ByteBuffer slice = buffer.slice();
-            int read = 0;
+            System.out.println("slice:"+slice);
 
             while (slice.hasRemaining()) {
+                System.out.println("before get:" +slice);
                 final byte b = slice.get();
-                read++;
+                System.out.println("after get:" +slice);
+                System.out.println("Read char " + (char) b);
 
                 if (b == (byte)c) {
-                    slice = slice.limit(read);
                     complete = true;
                     break;
                 }
                 else {
                     return new CharClaim(
                             c,
-                            List.of(),
+                            buffers,
                             Status.FAILED,
-                            -1
+                            0
                     );
                 }
             }
@@ -69,9 +80,11 @@ public final class CharClaim implements Claim {
 
         // OK key
         if (complete) {
+            System.out.println("CharClaim Complete: " + Arrays.toString(rv.toArray()));
             return new CharClaim(c, rv, Status.SUCCESSFUL, 1);
         } else {
             // ran out of buffer, need to try again?
+            System.out.println("CharClaim In-Progress: " + Arrays.toString(buffers.toArray()));
             return new CharClaim(c, buffers, Status.IN_PROGRESS, 0);
         }
     }

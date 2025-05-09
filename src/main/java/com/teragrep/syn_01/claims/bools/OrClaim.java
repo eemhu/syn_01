@@ -27,7 +27,7 @@ public class OrClaim implements Claim {
 
     @Override
     public Claim claim(final Claim previous, final ByteBuffer input) {
-        List<ByteBuffer> newBuffers = new ArrayList<>(previous.buffers());
+        List<ByteBuffer> newBuffers = new ArrayList<>(this.buffers);
         newBuffers.add(input);
 
         // OR uses same input for both
@@ -51,26 +51,30 @@ public class OrClaim implements Claim {
         // C1&C2 Successful
         if (firstClaim.status().equals(Status.SUCCESSFUL) && secondClaim.status().equals(Status.SUCCESSFUL)) {
             // check length
+            System.out.println("1st claim:"+firstClaim.length());
+            System.out.println("2nd claim:"+secondClaim.length());
             if (firstClaim.length() >= secondClaim.length()) {
-                return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, newBuffers, firstClaim.length());
+                System.out.println("Choose 1st claim");
+                return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, firstClaim.buffers(), firstClaim.length());
             }
             else {
-                return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, newBuffers, secondClaim.length());
+                System.out.println("Choose 2nd claim");
+                return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, secondClaim.buffers(), secondClaim.length());
             }
         }
 
         // C1 Only Successful
         if (firstClaim.status().equals(Status.SUCCESSFUL)) {
-            return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, firstClaim.buffers(), -1);
+            return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, firstClaim.buffers(), firstClaim.length());
         }
 
         // C2 Only Successful
         if (secondClaim.status().equals(Status.SUCCESSFUL)) {
-            return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, secondClaim.buffers(), -1);
+            return new OrClaim(firstClaim, secondClaim, Status.SUCCESSFUL, secondClaim.buffers(), secondClaim.length());
         }
 
         // Both failed
-        return new OrClaim(firstClaim, secondClaim, Status.FAILED, List.of(), -1);
+        return new OrClaim(firstClaim, secondClaim, Status.FAILED, List.of(), 0);
     }
 
     @Override

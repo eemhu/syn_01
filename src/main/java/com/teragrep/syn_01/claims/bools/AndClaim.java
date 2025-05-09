@@ -3,6 +3,7 @@ package com.teragrep.syn_01.claims.bools;
 import com.teragrep.syn_01.claims.Claim;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class AndClaim implements Claim {
@@ -26,6 +27,8 @@ public final class AndClaim implements Claim {
 
     @Override
     public Claim claim(final Claim previous, final ByteBuffer input) {
+        List<ByteBuffer> buffers = new ArrayList<>(this.buffers);
+        buffers.add(input);
         Claim firstClaim = first;
         Claim secondClaim = second;
 
@@ -33,20 +36,25 @@ public final class AndClaim implements Claim {
         if (firstClaim.status().equals(Status.IN_PROGRESS) || firstClaim.status().equals(Status.INITIAL)) {
             // continue from first
             firstClaim = firstClaim.claim(previous, input);
-            return new AndClaim(firstClaim, secondClaim, Status.IN_PROGRESS, firstClaim.buffers(), -1);
+            System.out.println("and First returns " + firstClaim.buffers());
+            return new AndClaim(firstClaim, secondClaim, Status.IN_PROGRESS, firstClaim.buffers(), firstClaim.length());
         }
         else if (firstClaim.status().equals(Status.SUCCESSFUL)) {
             // first success, go to second
             if (secondClaim.status().equals(Status.IN_PROGRESS) || secondClaim.status().equals(Status.INITIAL)) {
-                secondClaim = secondClaim.claim(previous, input);
-                return new AndClaim(firstClaim, secondClaim, secondClaim.status(), secondClaim.buffers(), -1);
+                System.out.println("first claim buffers: " + firstClaim.buffers());
+                System.out.println("previous buffers: " + previous.buffers());
+                secondClaim = secondClaim.claim(firstClaim, input);
+
+                return new AndClaim(firstClaim, secondClaim, secondClaim.status(), secondClaim.buffers(), firstClaim.length() + secondClaim.length());
             }
             else if (secondClaim.status().equals(Status.SUCCESSFUL)) {
-                return new AndClaim(firstClaim, secondClaim, Status.SUCCESSFUL, secondClaim.buffers(), -1);
+                return new AndClaim(firstClaim, secondClaim, Status.SUCCESSFUL, secondClaim.buffers(), firstClaim.length() + secondClaim.length());
             }
         }
 
-        return new AndClaim(firstClaim, secondClaim, Status.FAILED, buffers, -1);
+
+        return new AndClaim(firstClaim, secondClaim, Status.FAILED, buffers, 0);
     }
 
     @Override
@@ -61,6 +69,6 @@ public final class AndClaim implements Claim {
 
     @Override
     public int length() {
-        return 0;
+        return length;
     }
 }
