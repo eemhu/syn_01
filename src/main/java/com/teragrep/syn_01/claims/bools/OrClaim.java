@@ -33,8 +33,6 @@ public class OrClaim implements Claim {
         // OR uses same input for both
         Claim firstClaim = first;
         Claim secondClaim = second;
-        System.out.println("1st:"+firstClaim.status());
-        System.out.println("2nd:"+secondClaim.status());
 
         // C1 In-Progress
         if (firstClaim.status().equals(Status.INITIAL) || firstClaim.status().equals(Status.IN_PROGRESS)) {

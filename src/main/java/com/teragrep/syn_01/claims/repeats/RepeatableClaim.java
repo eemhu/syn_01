@@ -3,34 +3,72 @@ package com.teragrep.syn_01.claims.repeats;
 import com.teragrep.syn_01.claims.Claim;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 public class RepeatableClaim implements Claim {
     private final Claim claim;
     private final int minCount;
+    private final Claim.Status status;
+    private final List<ByteBuffer> buffers;
+    private final int length;
+    private final int currentCount;
 
     public RepeatableClaim(final Claim claim, final int minCount) {
+        this(claim, minCount, 0,  Status.INITIAL, List.of(), 0);
+    }
+
+    public RepeatableClaim(final Claim claim, final int minCount, final int currentCount, final Claim.Status status, final List<ByteBuffer> buffers, final int length) {
         this.claim = claim;
         this.minCount = minCount;
+        this.currentCount = currentCount;
+        this.status = status;
+        this.buffers = buffers;
+        this.length = length;
     }
 
     @Override
     public Claim claim(final Claim previous, final ByteBuffer input) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        List<ByteBuffer> newBuffers = new ArrayList<>(buffers);
+        if (newBuffers.isEmpty()) {
+            newBuffers.addAll(previous.buffers());
+        }
+        newBuffers.add(input);
+
+        Claim c = claim;
+        int newCurrentCount = currentCount;
+
+        if (c.status().equals(Status.INITIAL) || c.status().equals(Status.IN_PROGRESS)) {
+            c = c.claim(previous, input);
+            return new RepeatableClaim(c, minCount, currentCount, Status.IN_PROGRESS, newBuffers, c.length());
+        }
+        else if (c.status().equals(Status.SUCCESSFUL)) {
+            newCurrentCount++;
+            c = claim.claim(previous, input);
+            return new RepeatableClaim(c, minCount, newCurrentCount, Status.IN_PROGRESS, newBuffers, c.length());
+        }
+
+        // Failed
+        if (newCurrentCount < minCount) {
+            return new RepeatableClaim(c, minCount, newCurrentCount, Status.FAILED, newBuffers, c.length());
+        }
+
+        return new RepeatableClaim(c, minCount, newCurrentCount, Status.SUCCESSFUL, newBuffers, c.length());
+
     }
 
     @Override
     public Status status() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return status;
     }
 
     @Override
     public List<ByteBuffer> buffers() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return buffers;
     }
 
     @Override
     public int length() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        return length;
     }
 }

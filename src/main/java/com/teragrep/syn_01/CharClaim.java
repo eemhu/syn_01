@@ -38,24 +38,15 @@ public final class CharClaim implements Claim {
         }
         buffers.add(input);
 
-
-
         boolean complete = false;
         List<ByteBuffer> rv = new ArrayList<>();
 
-        System.out.println("CharClaim for char " + c);
-        System.out.println(buffers);
-
         for (final ByteBuffer buffer : buffers) {
-            System.out.println("Looping:"+buffer);
             ByteBuffer slice = buffer.slice();
-            System.out.println("slice:"+slice);
 
             while (slice.hasRemaining()) {
-                System.out.println("before get:" +slice);
                 final byte b = slice.get();
-                System.out.println("after get:" +slice);
-                System.out.println("Read char " + (char) b);
+                //System.out.println("Read char " + (char) b);
 
                 if (b == (byte)c) {
                     complete = true;
@@ -80,11 +71,9 @@ public final class CharClaim implements Claim {
 
         // OK key
         if (complete) {
-            System.out.println("CharClaim Complete: " + Arrays.toString(rv.toArray()));
             return new CharClaim(c, rv, Status.SUCCESSFUL, 1);
         } else {
             // ran out of buffer, need to try again?
-            System.out.println("CharClaim In-Progress: " + Arrays.toString(buffers.toArray()));
             return new CharClaim(c, buffers, Status.IN_PROGRESS, 0);
         }
     }

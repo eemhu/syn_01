@@ -36,14 +36,11 @@ public final class AndClaim implements Claim {
         if (firstClaim.status().equals(Status.IN_PROGRESS) || firstClaim.status().equals(Status.INITIAL)) {
             // continue from first
             firstClaim = firstClaim.claim(previous, input);
-            System.out.println("and First returns " + firstClaim.buffers());
             return new AndClaim(firstClaim, secondClaim, Status.IN_PROGRESS, firstClaim.buffers(), firstClaim.length());
         }
         else if (firstClaim.status().equals(Status.SUCCESSFUL)) {
             // first success, go to second
             if (secondClaim.status().equals(Status.IN_PROGRESS) || secondClaim.status().equals(Status.INITIAL)) {
-                System.out.println("first claim buffers: " + firstClaim.buffers());
-                System.out.println("previous buffers: " + previous.buffers());
                 secondClaim = secondClaim.claim(firstClaim, input);
 
                 return new AndClaim(firstClaim, secondClaim, secondClaim.status(), secondClaim.buffers(), firstClaim.length() + secondClaim.length());
