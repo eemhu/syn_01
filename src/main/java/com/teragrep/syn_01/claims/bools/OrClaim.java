@@ -5,8 +5,9 @@ import com.teragrep.syn_01.claims.Claim;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class OrClaim implements Claim {
+public final class OrClaim implements Claim {
     private final Claim first;
     private final Claim second;
     private final Claim.Status status;
@@ -88,5 +89,19 @@ public class OrClaim implements Claim {
     @Override
     public int length() {
         return length;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final OrClaim orClaim = (OrClaim) o;
+        return length == orClaim.length && Objects.equals(first, orClaim.first) && Objects.equals(second, orClaim.second) && status == orClaim.status && Objects.equals(buffers, orClaim.buffers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(first, second, status, buffers, length);
     }
 }

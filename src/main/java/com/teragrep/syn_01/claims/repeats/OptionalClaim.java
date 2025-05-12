@@ -5,6 +5,7 @@ import com.teragrep.syn_01.claims.Claim;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class OptionalClaim implements Claim {
     private final Claim claim;
@@ -53,5 +54,19 @@ public final class OptionalClaim implements Claim {
     @Override
     public int length() {
         return length;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final OptionalClaim that = (OptionalClaim) o;
+        return length == that.length && Objects.equals(claim, that.claim) && status == that.status && Objects.equals(buffers, that.buffers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(claim, status, buffers, length);
     }
 }

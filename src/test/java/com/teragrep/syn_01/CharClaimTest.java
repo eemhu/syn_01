@@ -3,6 +3,7 @@ package com.teragrep.syn_01;
 import com.teragrep.syn_01.claims.Claim;
 import com.teragrep.syn_01.claims.EmptyClaim;
 import com.teragrep.syn_01.claims.bools.AndClaim;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public final class CharClaimTest {
+    @Test
+    void testEqualsContract() {
+        EqualsVerifier.forClass(CharClaim.class).verify();
+    }
     @Test
     void testCharClaim() {
         CharClaim charClaim = new CharClaim('a');

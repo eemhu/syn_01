@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public final class CharClaim implements Claim {
     private final char c;
@@ -91,5 +92,19 @@ public final class CharClaim implements Claim {
     @Override
     public int length() {
         return length;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final CharClaim charClaim = (CharClaim) o;
+        return c == charClaim.c && length == charClaim.length && Objects.equals(buffers, charClaim.buffers) && status == charClaim.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(c, buffers, status, length);
     }
 }

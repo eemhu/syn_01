@@ -4,6 +4,7 @@ import com.teragrep.syn_01.claims.Claim;
 import com.teragrep.syn_01.claims.EmptyClaim;
 import com.teragrep.syn_01.claims.bools.AndClaim;
 import com.teragrep.syn_01.claims.bools.OrClaim;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,11 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public final class OrClaimTest {
+
+    @Test
+    void testEqualsContract() {
+        EqualsVerifier.forClass(OrClaim.class).verify();
+    }
 
     @Test
     void testFirstSuccess() {

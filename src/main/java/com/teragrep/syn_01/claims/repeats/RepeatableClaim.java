@@ -5,8 +5,9 @@ import com.teragrep.syn_01.claims.Claim;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class RepeatableClaim implements Claim {
+public final class RepeatableClaim implements Claim {
     private final Claim claim;
     private final int minCount;
     private final Claim.Status status;
@@ -70,5 +71,19 @@ public class RepeatableClaim implements Claim {
     @Override
     public int length() {
         return length;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final RepeatableClaim that = (RepeatableClaim) o;
+        return minCount == that.minCount && length == that.length && currentCount == that.currentCount && Objects.equals(claim, that.claim) && status == that.status && Objects.equals(buffers, that.buffers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(claim, minCount, status, buffers, length, currentCount);
     }
 }
