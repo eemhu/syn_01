@@ -18,7 +18,7 @@ public final class AndClaimTest {
     }
 
     @Test
-    void testAndClaim() {
+    void testAndClaimBothSuccessful() {
         ByteBuffer b0 = ByteBuffer.wrap("\"key\"".getBytes(StandardCharsets.UTF_8));
         ByteBuffer b1 = ByteBuffer.wrap("\"key2\"".getBytes(StandardCharsets.UTF_8));
 
@@ -30,8 +30,32 @@ public final class AndClaimTest {
     }
 
     @Test
-    void testAndClaimFailed() {
+    void testAndClaimFirstFailed() {
+        ByteBuffer b0 = ByteBuffer.wrap("FAIL".getBytes(StandardCharsets.UTF_8));
+        ByteBuffer b1 = ByteBuffer.wrap("\"key\"".getBytes(StandardCharsets.UTF_8));
+
+        Claim andClaim = new AndClaim(new KeyClaim(), new KeyClaim());
+        Claim cr1 = andClaim.claim(new EmptyClaim(), b0);
+        Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr1.status());
+        Claim cr2 = cr1.claim(cr1, b1);
+        Assertions.assertEquals(Claim.Status.FAILED, cr2.status());
+    }
+
+    @Test
+    void testAndClaimSecondFailed() {
         ByteBuffer b0 = ByteBuffer.wrap("\"key\"".getBytes(StandardCharsets.UTF_8));
+        ByteBuffer b1 = ByteBuffer.wrap("FAIL".getBytes(StandardCharsets.UTF_8));
+
+        Claim andClaim = new AndClaim(new KeyClaim(), new KeyClaim());
+        Claim cr1 = andClaim.claim(new EmptyClaim(), b0);
+        Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr1.status());
+        Claim cr2 = cr1.claim(cr1, b1);
+        Assertions.assertEquals(Claim.Status.FAILED, cr2.status());
+    }
+
+    @Test
+    void testAndClaimBothFailed() {
+        ByteBuffer b0 = ByteBuffer.wrap("FAIL".getBytes(StandardCharsets.UTF_8));
         ByteBuffer b1 = ByteBuffer.wrap("FAIL".getBytes(StandardCharsets.UTF_8));
 
         Claim andClaim = new AndClaim(new KeyClaim(), new KeyClaim());
