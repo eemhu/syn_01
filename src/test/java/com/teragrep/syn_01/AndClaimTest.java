@@ -26,7 +26,11 @@ public final class AndClaimTest {
         Claim cr1 = andClaim.claim(new EmptyClaim(), b0);
         Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr1.status());
         Claim cr2 = cr1.claim(cr1, b1);
+
         Assertions.assertEquals(Claim.Status.SUCCESSFUL, cr2.status());
+        Assertions.assertEquals(1, cr2.buffers().size());
+        Assertions.assertEquals(6, cr2.buffers().get(0).position());
+        Assertions.assertEquals(6, cr2.buffers().get(0).capacity());
     }
 
     @Test
@@ -38,7 +42,11 @@ public final class AndClaimTest {
         Claim cr1 = andClaim.claim(new EmptyClaim(), b0);
         Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr1.status());
         Claim cr2 = cr1.claim(cr1, b1);
+
         Assertions.assertEquals(Claim.Status.FAILED, cr2.status());
+        Assertions.assertEquals(1, cr2.buffers().size());
+        Assertions.assertEquals(0, cr2.buffers().get(0).position());
+        Assertions.assertEquals(5, cr2.buffers().get(0).capacity());
     }
 
     @Test
@@ -51,6 +59,8 @@ public final class AndClaimTest {
         Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr1.status());
         Claim cr2 = cr1.claim(cr1, b1);
         Assertions.assertEquals(Claim.Status.FAILED, cr2.status());
+
+        Assertions.assertEquals(0, cr2.buffers().size());
     }
 
     @Test
@@ -63,6 +73,10 @@ public final class AndClaimTest {
         Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr1.status());
         Claim cr2 = cr1.claim(cr1, b1);
         Assertions.assertEquals(Claim.Status.FAILED, cr2.status());
+
+        Assertions.assertEquals(1, cr2.buffers().size());
+        Assertions.assertEquals(0, cr2.buffers().get(0).position());
+        Assertions.assertEquals(4, cr2.buffers().get(0).capacity());
     }
 
     @Test
@@ -78,6 +92,9 @@ public final class AndClaimTest {
         Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr2.status());
         Claim cr3 = cr2.claim(cr2, b2);
         Assertions.assertEquals(Claim.Status.SUCCESSFUL, cr3.status());
+        Assertions.assertEquals(1, cr3.buffers().size());
+        Assertions.assertEquals(6, cr3.buffers().get(0).position());
+        Assertions.assertEquals(6, cr3.buffers().get(0).capacity());
     }
 
     @Test
@@ -96,5 +113,8 @@ public final class AndClaimTest {
         Assertions.assertEquals(Claim.Status.IN_PROGRESS, cr3.status());
         Claim cr4 = cr3.claim(cr3, b3);
         Assertions.assertEquals(Claim.Status.SUCCESSFUL, cr4.status());
+        Assertions.assertEquals(1, cr4.buffers().size());
+        Assertions.assertEquals(2, cr4.buffers().get(0).position());
+        Assertions.assertEquals(2, cr4.buffers().get(0).capacity());
     }
 }
